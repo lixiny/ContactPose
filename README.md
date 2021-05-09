@@ -1,5 +1,7 @@
 [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/contactpose-a-dataset-of-grasps-with-object/grasp-contact-prediction-on-contactpose)](https://paperswithcode.com/sota/grasp-contact-prediction-on-contactpose?p=contactpose-a-dataset-of-grasps-with-object)
 
+## Diff from the original repo
+* make the data root directory and mano root directory optional (in `utilities.dataset.py`), which enable us to import ContactPose as a package into other project. 
 
 # [ContactPose](https://contactpose.cc.gatech.edu)
 Download and pre-processing utilities + Python dataloader for the ContactPose dataset.

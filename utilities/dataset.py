@@ -35,7 +35,7 @@ def get_intents(p_num, object_name):
       out.append(ins)
   return out
 
-    
+
 def get_p_nums(object_name, intent):
   """
   returns list of participants who grasped this object with this intent
@@ -55,7 +55,7 @@ class ContactPose(object):
   """
   _mano_dicts = None  # class variable so that large data is not loaded repeatedly
   def __init__(self, p_num, intent, object_name, mano_pose_params=15,
-               load_mano=True):
+               load_mano=True, data_root="data", mano_root="thirdparty/mano"):
     """
     load_mano: Flag can be used to prevent loading MANO hand models, which is
     time consuming
@@ -67,11 +67,11 @@ class ContactPose(object):
     self.intent = intent
     self.object_name = object_name
     self._mano_pose_params = mano_pose_params
-  
+
     p_id = 'full{:d}_{:s}'.format(p_num, intent)
-    self.data_dir = osp.join('data', 'contactpose_data', p_id, object_name)
+    self.data_dir = osp.join(data_root, 'contactpose_data', p_id, object_name)
     assert(osp.isdir(self.data_dir))
-    
+
     # read grasp data
     with open(self.annotation_filename, 'r') as f:
       ann = json.load(f)
@@ -127,7 +127,7 @@ class ContactPose(object):
     self._ox = []  # joint projections
     self._om = []  # marker projections
     # 3D marker locations w.r.t. object
-    oM = np.loadtxt(osp.join('data', 'object_marker_locations',
+    oM = np.loadtxt(osp.join(data_root, 'object_marker_locations',
                              '{:s}_final_marker_locations.txt'.
                              format(object_name)))[:, :3]
     for frame_idx in range(len(self)):
@@ -155,7 +155,7 @@ class ContactPose(object):
         return
       ContactPose._mano_dicts = []
       for hand_name in ('LEFT', 'RIGHT'):
-        filename = osp.join('thirdparty', 'mano', 'models',
+        filename = osp.join( mano_root, 'models',
                             'MANO_{:s}.pkl'.format(hand_name))
         with open(filename, 'rb') as f:
           ContactPose._mano_dicts.append(pickle.load(f, encoding='latin1'))
@@ -201,7 +201,7 @@ class ContactPose(object):
     """
     return list of cameras valid for this grasp
     """
-    return self._valid_cameras 
+    return self._valid_cameras
 
   @property
   def mano_params(self):
@@ -217,7 +217,7 @@ class ContactPose(object):
       if not p['valid']:
         out.append(None)
         continue
-    
+
       # MANO root pose w.r.t. hand
       hTm = np.linalg.inv(mutils.pose_matrix(p['mTc']))
       out.append({
@@ -226,13 +226,13 @@ class ContactPose(object):
         'hTm': hTm,
       })
     return out
-  
+
   def im_size(self, camera_name):
     """
     (width, height) in pixels
     """
     return (960, 540) if camera_name == 'kinect2_middle' else (540, 960)
-  
+
   def image_filenames(self, mode, frame_idx):
     """
     return dict with full image filenames for all valid cameras
